@@ -157,7 +157,10 @@ export const useBookingStore = defineStore('booking', {
         this.loading = false
       }
     },
+    // ===================== 🔹 UPDATE BOOKING STATUS =====================
+    // ... (state dan actions lainnya) ...
 
+    // ===================== 🔹 UPDATE BOOKING STATUS =====================
     async updateBookingStatus(
       id: string,
       payload: BookingUpdateStatusPayload,
@@ -165,14 +168,20 @@ export const useBookingStore = defineStore('booking', {
       this.loading = true
       this.error = null
       try {
-        const url = `${baseBookingUrl}/${id}/update-status` // URL diperbaiki
-        const response = await axios.put<any>(url, payload)
-        const updatedBookingData = response.data?.data as Booking
+        // [FIX] URL endpoint disesuaikan dengan spesifikasi: /bookings/{id}/update-status
+        const url = `${baseBookingUrl}/${id}/update-status`
+        const response = await axios.put<CommonResponseInterface<Booking>>(url, payload)
+        const updatedBookingData = response.data.data
 
         if (response.data?.status === 200 && updatedBookingData) {
+          // Update state lokal agar UI reaktif
+          if (this.currentBooking?.id === id) {
+            this.currentBooking = updatedBookingData
+          }
           const index = this.bookings.findIndex((b) => b.id === id)
-          if (index !== -1) this.bookings[index] = updatedBookingData
-          if (this.currentBooking?.id === id) this.currentBooking = updatedBookingData
+          if (index !== -1) {
+            this.bookings[index] = updatedBookingData
+          }
 
           toast.success(`Status pesanan ${id} berhasil diubah menjadi ${payload.newStatus}.`)
           return updatedBookingData
@@ -188,6 +197,8 @@ export const useBookingStore = defineStore('booking', {
         this.loading = false
       }
     },
+
+    // ... (sisa actions) ...
 
     async updateBookingAddOns(
       id: string,

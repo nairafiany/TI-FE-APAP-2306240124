@@ -24,7 +24,6 @@ export class BookingService {
     return BookingService.instance
   }
 
-  // ===================== 🔹 GET ALL BOOKINGS =====================
   async getAllBookings(): Promise<Booking[]> {
     try {
       const { data } = await axios.get<CommonResponseInterface<Booking[]>>(baseBookingUrl)
@@ -45,7 +44,6 @@ export class BookingService {
     }
   }
 
-  // ===================== 🔹 GET BOOKING BY ID =====================
   async getBookingById(id: string): Promise<Booking | null> {
     try {
       const { data } = await axios.get<CommonResponseInterface<Booking>>(`${baseBookingUrl}/${id}`)
@@ -64,7 +62,6 @@ export class BookingService {
     }
   }
 
-  // ===================== 🔹 CREATE BOOKING =====================
   async createBooking(payload: BookingCreatePayload): Promise<Booking | null> {
     try {
       const { data } = await axios.post<CommonResponseInterface<Booking>>(baseBookingUrl, payload)
@@ -83,7 +80,6 @@ export class BookingService {
     }
   }
 
-  // ===================== 🔹 SEARCH AVAILABLE VEHICLES =====================
   async searchAvailableVehicles(payload: BookingSearchPayload): Promise<Vehicle[]> {
     try {
       const { data } = await axios.post<CommonResponseInterface<Vehicle[]>>(
@@ -110,7 +106,6 @@ export class BookingService {
     }
   }
 
-  // ===================== 🔹 UPDATE BOOKING DETAILS =====================
   async updateBookingDetails(
     id: string,
     payload: BookingUpdateDetailsPayload,
@@ -133,7 +128,6 @@ export class BookingService {
     }
   }
 
-  // ===================== 🔹 UPDATE BOOKING STATUS =====================
   async updateBookingStatus(
     id: string,
     payload: BookingUpdateStatusPayload,
@@ -157,7 +151,6 @@ export class BookingService {
     }
   }
 
-  // ===================== 🔹 UPDATE BOOKING ADD-ONS =====================
   async updateBookingAddOns(
     id: string,
     payload: BookingUpdateAddOnsPayload,
@@ -180,7 +173,6 @@ export class BookingService {
     }
   }
 
-  // ===================== 🔹 CANCEL BOOKING (SOFT DELETE) =====================
   async cancelBooking(id: string): Promise<boolean> {
     try {
       const url = `${baseBookingUrl}/${id}/delete`

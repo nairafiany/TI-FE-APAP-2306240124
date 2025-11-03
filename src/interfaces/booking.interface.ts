@@ -1,75 +1,72 @@
-import type { Vehicle } from './vehicle.interface' // Asumsi Anda punya ini
+import type { Vehicle } from './vehicle.interface'
 
 /**
- * Sesuai dengan RentalBookingResponseDTO.java
+ * Interface untuk DTO Add-On yang dikirim backend
+ * Sesuai dengan RentalAddOnResponseDTO.java
+ */
+export interface AddOnDetail {
+  id: number // Long di Java menjadi number di JSON/TS
+  name: string
+  price: number // Double di Java menjadi number di JSON/TS
+}
+
+/**
+ * [FINAL] Sesuai dengan RentalBookingResponseDTO.java Anda yang sudah lengkap
  */
 export interface Booking {
-  id: string // Misal: VR000005
-  vehicleId: string // Misal: VEH0003
-  vehicleName: string // Misal: Toyota Avanza
-  pickUpLocation: string
-  dropOffLocation: string
-  totalPrice: number
-  status: 'Upcoming' | 'Ongoing' | 'Done' // Status yang mungkin
-  includeDriver: boolean
-  // Tambahkan createdAt jika API mengembalikannya untuk sorting
-  // createdAt?: string;
-
-  // Tambahkan pickUpTime dan dropOffTime jika diperlukan di detail
-  pickUpTime?: string
-  dropOffTime?: string
-}
-
-/**
- * Payload untuk membuat booking baru (RentalBookingCreateRequestDTO)
- */
-export interface BookingCreatePayload {
+  id: string
   vehicleId: string
+  vehicleName: string
   pickUpLocation: string
   dropOffLocation: string
-  pickUpTime: string // ISO String format (YYYY-MM-DDTHH:mm:ss)
-  dropOffTime: string // ISO String format
+  pickUpTime: string | Date
+  dropOffTime: string | Date
+  totalPrice: number
+  status: 'Upcoming' | 'Ongoing' | 'Done'
   includeDriver: boolean
-  addOnIds?: number[] // Asumsi ID AddOn adalah number (UUID di backend bisa string)
+
+  // [FIX] Properti-properti ini sekarang akan diisi oleh getBookingById
+  capacityNeeded?: number
+  transmissionNeeded?: 'Manual' | 'Automatic'
+  listOfAddOns?: AddOnDetail[]
 }
 
-/**
- * Payload untuk mencari kendaraan (RentalBookingSearchRequestDTO)
- */
 export interface BookingSearchPayload {
+  includeDriver: boolean
   pickUpLocation: string
   dropOffLocation: string
-  pickUpTime: string // ISO String format
-  dropOffTime: string // ISO String format
+  pickUpTime: string
+  dropOffTime: string
   capacityNeeded: number
   transmissionNeeded: 'Manual' | 'Automatic'
-  includeDriver?: boolean // Optional, default false
+  bookingIdToExclude?: string // Diperlukan untuk alur update
 }
 
 /**
- * Payload untuk update detail booking (RentalBookingUpdateDetailsRequestDTO)
+ * Payload untuk MEMBUAT booking baru.
  */
-export interface BookingUpdateDetailsPayload {
-  pickUpLocation: string
-  dropOffLocation: string
-  pickUpTime: string // ISO String format
-  dropOffTime: string // ISO String format
-  includeDriver: boolean
+export interface BookingCreatePayload extends BookingSearchPayload {
+  vehicleId: string
+  addOnIds: number[]
 }
 
 /**
- * Payload untuk update status booking (RentalBookingUpdateStatusRequestDTO)
+ * [FIX] Payload untuk MENGUBAH DETAIL booking.
+ * Sekarang kembali membutuhkan semua kriteria pencarian + ID kendaraan baru.
+ */
+export interface BookingUpdateDetailsPayload extends BookingSearchPayload {
+  vehicleId: string
+}
+/**
+ * Payload untuk MENGUBAH STATUS booking.
  */
 export interface BookingUpdateStatusPayload {
   newStatus: 'Ongoing' | 'Done'
 }
 
 /**
- * Payload untuk update add-ons booking (RentalBookingUpdateAddOnsRequestDTO)
+ * Payload untuk MENGUBAH ADD-ONS booking.
  */
 export interface BookingUpdateAddOnsPayload {
-  addOnIds: number[] // Asumsi ID AddOn adalah number
+  addOnIds: number[]
 }
-
-// Interface untuk hasil pencarian kendaraan (dari endpoint /search)
-export type VehicleSearchResult = Vehicle // Gunakan interface Vehicle yang sudah ada

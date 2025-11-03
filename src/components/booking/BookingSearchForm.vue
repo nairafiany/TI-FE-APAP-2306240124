@@ -12,7 +12,6 @@
           >Include Driver? <span class="text-gray-500 font-normal">(Rp 100.000/day)</span></label
         >
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
         <div>
           <label for="pickUpLocation" class="block text-sm font-medium text-gray-800 mb-1"
@@ -57,7 +56,6 @@
           </select>
         </div>
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
         <div>
           <label for="pickUpTime" class="block text-sm font-medium text-gray-800 mb-1"
@@ -86,7 +84,6 @@
           />
         </div>
       </div>
-
       <div>
         <label for="capacityNeeded" class="block text-sm font-medium text-gray-800 mb-1"
           >Capacity Needed</label
@@ -100,7 +97,6 @@
           class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 disabled:bg-gray-100"
         />
       </div>
-
       <div>
         <label class="block text-sm font-medium text-gray-800 mb-2">Transmission</label>
         <div class="flex items-center space-x-6">
@@ -128,7 +124,6 @@
           </div>
         </div>
       </div>
-
       <div class="pt-2">
         <button
           type="submit"
@@ -143,21 +138,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect, type PropType } from 'vue'
 import { useLocationStore } from '@/stores/location.store'
 import type { BookingSearchPayload } from '@/interfaces/booking.interface'
 import { toast } from 'vue-sonner'
 
-defineProps<{
-  loading: boolean
-}>()
+const props = defineProps({
+  loading: Boolean,
+  prefilledData: {
+    type: Object as PropType<BookingSearchPayload | null>,
+    default: null,
+  },
+})
 
-const emit = defineEmits<{
-  (e: 'search', payload: BookingSearchPayload): void
-}>()
-
+const emit = defineEmits<{ (e: 'search', payload: BookingSearchPayload): void }>()
 const locationStore = useLocationStore()
-
 const form = ref<BookingSearchPayload>({
   includeDriver: false,
   pickUpLocation: '',
@@ -172,6 +167,12 @@ const minDateTime = computed(() => {
   const now = new Date()
   now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
   return now.toISOString().slice(0, 16)
+})
+
+watchEffect(() => {
+  if (props.prefilledData) {
+    form.value = { ...props.prefilledData }
+  }
 })
 
 const onSearch = () => {

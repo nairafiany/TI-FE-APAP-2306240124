@@ -1,6 +1,8 @@
-<!-- <template>
+<template>
   <div class="p-4 md:p-8 max-w-3xl mx-auto">
-    <div v-if="!isDataLoaded" class="text-center py-10">Loading booking details...</div>
+    <div v-if="!isDataLoaded" class="text-center py-10 text-gray-500">
+      Loading booking details...
+    </div>
 
     <div v-else class="bg-white p-6 rounded-lg shadow-md space-y-6">
       <h1 class="text-2xl font-bold text-gray-800 border-b pb-4 mb-4">
@@ -10,15 +12,16 @@
       <BookingSearchForm
         :loading="bookingStore.loadingSearch"
         :prefilled-data="prefillData"
-        @search="handleSearch"
+        @search="handleManualSearch"
       />
 
-      <div v-if="showResults" class="space-y-4 mt-6">
+      <div class="space-y-4 mt-6">
         <h2 class="text-xl font-semibold text-gray-700">Available Vehicles</h2>
 
         <div v-if="bookingStore.loadingSearch" class="text-center py-6 text-gray-500">
           Searching for available vehicles...
         </div>
+
         <div v-else>
           <div
             v-if="!bookingStore.availableVehicles.length"
@@ -26,6 +29,7 @@
           >
             <p class="text-gray-500">No available vehicles match your criteria.</p>
           </div>
+
           <div v-else class="space-y-3">
             <div
               v-for="vehicle in bookingStore.availableVehicles"
@@ -99,8 +103,8 @@ import type {
 } from '@/interfaces/booking.interface'
 import type { Vehicle } from '@/interfaces/vehicle.interface'
 
+// Helper untuk format tanggal dari ISO string ke format input datetime-local
 const formatDateTimeForInput = (isoString: string | Date | undefined): string => {
-  // [FIX] Handle undefined case
   if (!isoString) return ''
   const date = new Date(isoString)
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
@@ -114,44 +118,63 @@ const locationStore = useLocationStore()
 
 const bookingId = ref(route.params.id as string)
 const isDataLoaded = ref(false)
-
 const prefillData = ref<BookingSearchPayload | null>(null)
 const currentSearchCriteria = ref<BookingSearchPayload | null>(null)
 const selectedVehicle = ref<Vehicle | null>(null)
-const showResults = ref(false)
 
+// Ambil data saat komponen dimuat
 onMounted(async () => {
   await locationStore.fetchProvinces()
   await bookingStore.getBookingById(bookingId.value)
 })
 
+// Watcher untuk melakukan aksi setelah data booking dimuat
 watch(
   () => bookingStore.currentBooking,
-  (booking) => {
+  async (booking) => {
     if (booking) {
+      // Validasi status
       if (booking.status !== 'Upcoming') {
         toast.error('You can only update bookings with "Upcoming" status.')
         router.push(`/bookings/${booking.id}`)
         return
       }
 
+      // Siapkan payload untuk pre-fill form dan pencarian otomatis
       const data: BookingSearchPayload = {
         includeDriver: booking.includeDriver,
         pickUpLocation: booking.pickUpLocation,
         dropOffLocation: booking.dropOffLocation,
-        pickUpTime: formatDateTimeForInput(booking.pickUpTime), // Aman karena sudah dihandle
-        dropOffTime: formatDateTimeForInput(booking.dropOffTime), // Aman karena sudah dihandle
+        pickUpTime: formatDateTimeForInput(booking.pickUpTime),
+        dropOffTime: formatDateTimeForInput(booking.dropOffTime),
         capacityNeeded: booking.capacityNeeded || 1,
-        transmissionNeeded: booking.transmissionNeeded || 'Automatic',
+        transmissionNeeded: (booking.transmissionNeeded as 'Manual' | 'Automatic') || 'Automatic',
+        // KIRIM ID BOOKING SAAT INI UNTUK DIKECUALIKAN
+        bookingIdToExclude: booking.id,
       }
 
       prefillData.value = data
       currentSearchCriteria.value = data
       isDataLoaded.value = true
+
+      // Lakukan pencarian otomatis
+      await bookingStore.searchAvailableVehicles(data)
+
+      // Cari dan pilih otomatis kendaraan yang sudah dipesan sebelumnya dari hasil pencarian
+      const originalVehicle = bookingStore.availableVehicles.find((v) => v.id === booking.vehicleId)
+      if (originalVehicle) {
+        selectedVehicle.value = originalVehicle
+      } else {
+        toast.warning(
+          'The original vehicle is no longer available with these details. Please select another one.',
+        )
+        selectedVehicle.value = null // Biarkan kosong jika tidak tersedia
+      }
     }
   },
 )
 
+// Computed property untuk menghitung jumlah hari sewa
 const rentalDays = computed(() => {
   if (!currentSearchCriteria.value?.pickUpTime || !currentSearchCriteria.value?.dropOffTime)
     return 1
@@ -162,6 +185,7 @@ const rentalDays = computed(() => {
   return Math.max(1, diffDays)
 })
 
+// Fungsi untuk menghitung total harga kendaraan
 const calculateVehicleTotalPrice = (vehicle: Vehicle) => {
   if (!currentSearchCriteria.value) return vehicle.price || 0
   const vehiclePrice = vehicle.price || 0
@@ -170,32 +194,33 @@ const calculateVehicleTotalPrice = (vehicle: Vehicle) => {
   return vehicleCost + driverCost
 }
 
-const handleSearch = async (payload: BookingSearchPayload) => {
+// Fungsi untuk pencarian MANUAL oleh pengguna
+const handleManualSearch = async (payload: BookingSearchPayload) => {
   selectedVehicle.value = null
-  currentSearchCriteria.value = payload
-  showResults.value = true
-  await bookingStore.searchAvailableVehicles(payload)
 
-  const oldVehicleStillAvailable = bookingStore.availableVehicles.find(
-    (v) => v.id === bookingStore.currentBooking?.vehicleId,
-  )
-  if (oldVehicleStillAvailable) {
-    selectedVehicle.value = oldVehicleStillAvailable
+  // Tambahkan juga ID saat pengguna mencari secara manual
+  const searchPayload: BookingSearchPayload = {
+    ...payload,
+    bookingIdToExclude: bookingId.value,
   }
+
+  currentSearchCriteria.value = searchPayload
+  await bookingStore.searchAvailableVehicles(searchPayload)
 }
 
+// Fungsi saat pengguna memilih kendaraan dari daftar
 const handleSelectVehicle = (vehicle: Vehicle) => {
   selectedVehicle.value = vehicle
   toast.success(`${vehicle.brand} ${vehicle.model} selected.`)
 }
 
+// Fungsi saat pengguna menekan tombol "Save Changes"
 const handleSaveChanges = async () => {
   if (!selectedVehicle.value || !currentSearchCriteria.value) {
     toast.error('Please select a vehicle before saving.')
     return
   }
 
-  // [FIX] Sekarang payload cocok dengan interface yang diperbarui
   const payload: BookingUpdateDetailsPayload = {
     ...currentSearchCriteria.value,
     vehicleId: selectedVehicle.value.id,
@@ -206,4 +231,4 @@ const handleSaveChanges = async () => {
     router.push(`/bookings/${updatedBooking.id}`)
   }
 }
-</script> -->
+</script>

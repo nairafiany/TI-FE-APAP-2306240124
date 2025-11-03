@@ -15,7 +15,6 @@ export class VehicleService {
     return VehicleService.instance
   }
 
-  // =========================== 🔹 GET ALL VEHICLES ===========================
   async getAllVehicles(): Promise<Vehicle[]> {
     try {
       const { data } = await axios.get<CommonResponseInterface<Vehicle[]>>(baseVehicleUrl)
@@ -33,7 +32,6 @@ export class VehicleService {
     }
   }
 
-  // =========================== 🔹 GET FILTERED VEHICLES ===========================
   async getFilteredVehicles(type: string, keyword: string): Promise<Vehicle[]> {
     try {
       const { data } = await axios.get<CommonResponseInterface<Vehicle[]>>(
@@ -58,7 +56,6 @@ export class VehicleService {
     }
   }
 
-  // =========================== 🔹 GET VEHICLE BY ID ===========================
   async getVehicleById(id: string): Promise<Vehicle | null> {
     try {
       const { data } = await axios.get<CommonResponseInterface<Vehicle>>(`${baseVehicleUrl}/${id}`)
@@ -73,7 +70,6 @@ export class VehicleService {
     }
   }
 
-  // =========================== 🔹 CREATE VEHICLE ===========================
   async createVehicle(payload: VehicleCreatePayload): Promise<Vehicle | null> {
     try {
       const { data } = await axios.post<CommonResponseInterface<Vehicle>>(baseVehicleUrl, payload)
@@ -93,11 +89,6 @@ export class VehicleService {
     }
   }
 
-  // =========================== 🔹 UPDATE VEHICLE ===========================
-  /**
-   * Catatan: Mengirim VehicleCreatePayload, sesuai dengan endpoint
-   * @PutMapping("/{id}") di VehicleRestController Anda.
-   */
   async updateVehicle(id: string, payload: VehicleCreatePayload): Promise<Vehicle | null> {
     try {
       const { data } = await axios.put<CommonResponseInterface<Vehicle>>(
@@ -122,7 +113,6 @@ export class VehicleService {
     }
   }
 
-  // =========================== 🔹 DELETE VEHICLE ===========================
   async deleteVehicle(id: string): Promise<boolean> {
     console.log('🧹 Menghapus kendaraan dari backend ID:', id)
     try {

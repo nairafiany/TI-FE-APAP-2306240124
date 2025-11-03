@@ -16,7 +16,6 @@ export class AddOnService {
     return AddOnService.instance
   }
 
-  // ===================== 🔹 GET ALL ADD-ONS =====================
   async getAllAddOns(): Promise<RentalAddOn[]> {
     try {
       // Menggunakan tipe respons yang sama seperti di booking service
