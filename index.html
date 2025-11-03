@@ -1,13 +1,21 @@
-<!DOCTYPE html>
-<html lang="">
+<!doctype html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Vehicle Rental App</title>
+
+    <!-- ✅ Flowbite CSS (opsional jika mau cepat aktifin komponen Flowbite langsung di HTML) -->
+    <!-- Tapi jika kamu sudah pakai plugin @plugin "flowbite/plugin" di Tailwind, ini boleh dilewati -->
   </head>
-  <body>
+  <body class="bg-gray-50">
     <div id="app"></div>
+
+    <!-- ✅ Tambahkan ini supaya komponen Flowbite bisa berfungsi -->
+    <script src="./node_modules/flowbite/dist/flowbite.min.js"></script>
+
+    <!-- ✅ Script utama Vite/Vue -->
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

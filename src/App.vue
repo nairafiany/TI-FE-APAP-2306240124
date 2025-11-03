@@ -1,85 +1,46 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { Toaster } from 'vue-sonner'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <!-- ✅ Toast Notification -->
+  <Toaster position="top-center" rich-colors />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <!-- ✅ Navbar -->
+  <nav class="bg-green-700 text-white px-8 py-4 flex justify-between items-center shadow-md">
+    <div class="text-lg font-bold">Vehicle Rental App</div>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+    <div class="flex gap-6 font-medium">
+      <RouterLink
+        to="/vehicles"
+        class="hover:text-yellow-200 transition"
+        active-class="underline underline-offset-4 text-yellow-200"
+      >
+        Vehicles
+      </RouterLink>
+      <RouterLink
+        to="/bookings"
+        class="hover:text-yellow-200 transition"
+        active-class="underline underline-offset-4 text-yellow-200"
+      >
+        Bookings
+      </RouterLink>
     </div>
-  </header>
+  </nav>
 
-  <RouterView />
+  <!-- ✅ Main Content -->
+  <main class="bg-gray-50 min-h-screen p-6">
+    <RouterView />
+  </main>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+* {
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.router-link-active {
+  color: #fef08a;
 }
 </style>
