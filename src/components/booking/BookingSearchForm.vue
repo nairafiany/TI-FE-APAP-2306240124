@@ -138,7 +138,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watchEffect, type PropType } from 'vue'
+// 1. Tambahkan 'watch' di sini
+import { ref, computed, watchEffect, type PropType, watch } from 'vue'
 import { useLocationStore } from '@/stores/location.store'
 import type { BookingSearchPayload } from '@/interfaces/booking.interface'
 import { toast } from 'vue-sonner'
@@ -151,7 +152,12 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits<{ (e: 'search', payload: BookingSearchPayload): void }>()
+// 2. Tambahkan 'change' ke defineEmits
+const emit = defineEmits<{
+  (e: 'search', payload: BookingSearchPayload): void
+  (e: 'change', payload: BookingSearchPayload): void // <-- PERBAIKAN DI SINI
+}>()
+
 const locationStore = useLocationStore()
 const form = ref<BookingSearchPayload>({
   includeDriver: false,
@@ -169,11 +175,22 @@ const minDateTime = computed(() => {
   return now.toISOString().slice(0, 16)
 })
 
+// watchEffect ini sudah benar, untuk mengisi form saat pertama kali
 watchEffect(() => {
   if (props.prefilledData) {
     form.value = { ...props.prefilledData }
   }
 })
+
+// 3. Tambahkan watch baru ini untuk memberi tahu induk setiap ada perubahan
+watch(
+  form,
+  (newForm) => {
+    // Emit perubahan ke induk secara real-time
+    emit('change', newForm)
+  },
+  { deep: true }, // 'deep: true' penting untuk memantau semua properti di 'form'
+)
 
 const onSearch = () => {
   if (!form.value.pickUpTime || !form.value.dropOffTime) {

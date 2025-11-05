@@ -13,6 +13,7 @@
         :loading="bookingStore.loadingSearch"
         :prefilled-data="prefillData"
         @search="handleManualSearch"
+        @change="handleFormChange"
       />
 
       <div class="space-y-4 mt-6">
@@ -208,6 +209,17 @@ const handleManualSearch = async (payload: BookingSearchPayload) => {
   await bookingStore.searchAvailableVehicles(searchPayload)
 }
 
+// 2. Tambahkan fungsi handler baru ini
+const handleFormChange = (payload: BookingSearchPayload) => {
+  // Fungsi ini akan dipanggil setiap kali ada ketikan di form
+  // Ini menjaga 'currentSearchCriteria' tetap sinkron
+  currentSearchCriteria.value = {
+    ...payload,
+    // Pastikan bookingIdToExclude selalu ada
+    bookingIdToExclude: bookingId.value,
+  }
+}
+
 // Fungsi saat pengguna memilih kendaraan dari daftar
 const handleSelectVehicle = (vehicle: Vehicle) => {
   selectedVehicle.value = vehicle
@@ -221,6 +233,7 @@ const handleSaveChanges = async () => {
     return
   }
 
+  // 'currentSearchCriteria.value' sekarang akan SELALU up-to-date
   const payload: BookingUpdateDetailsPayload = {
     ...currentSearchCriteria.value,
     vehicleId: selectedVehicle.value.id,

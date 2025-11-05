@@ -49,19 +49,22 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { VehicleSearchResult, BookingSearchPayload } from '@/interfaces/booking.interface'
+// 1. Ubah import ini: 'VehicleSearchResult' tidak ada
+import type { BookingSearchPayload } from '@/interfaces/booking.interface'
+// 2. Tambahkan import ini: 'Vehicle' adalah tipe yang benar
+import type { Vehicle } from '@/interfaces/vehicle.interface'
 
 const props = defineProps<{
-  vehicles: VehicleSearchResult[]
+  // 3. Ubah tipe prop ini
+  vehicles: Vehicle[]
   searchCriteria: BookingSearchPayload | null
   loading: boolean
 }>()
 
 defineEmits<{
-  (e: 'select', vehicle: VehicleSearchResult): void
+  (e: 'select', vehicle: Vehicle): void // 4. Ubah tipe emit ini juga
   (e: 'back'): void
 }>()
 
@@ -74,7 +77,8 @@ const rentalDays = computed(() => {
   return Math.max(1, diffDays) // Minimum 1 day
 })
 
-const calculateTotalPrice = (vehicle: VehicleSearchResult) => {
+// Fungsi ini sekarang akan berfungsi karena 'vehicle.price' ada di interface 'Vehicle'
+const calculateTotalPrice = (vehicle: Vehicle) => {
   if (!props.searchCriteria) return vehicle.price
   const vehicleCost = rentalDays.value * vehicle.price
   const driverCost = props.searchCriteria.includeDriver ? rentalDays.value * 100000 : 0
