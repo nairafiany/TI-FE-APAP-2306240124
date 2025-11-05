@@ -116,28 +116,42 @@
 
     <div v-else class="text-center p-10 text-gray-500">Booking not found.</div>
 
-    <div
-      v-if="isAddOnsPopupVisible"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-        <h3 class="text-xl font-bold mb-4">Selected Add-Ons</h3>
-        <ul v-if="booking?.listOfAddOns && booking.listOfAddOns.length" class="space-y-3 mb-6">
-          <li
-            v-for="addon in booking.listOfAddOns"
-            :key="addon.id"
-            class="flex justify-between items-center text-gray-700"
+    <!-- 🌿 Modern Popup Add-Ons -->
+    <transition name="fade">
+      <div
+        v-if="isAddOnsPopupVisible"
+        class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-white/30"
+      >
+        <transition name="scale">
+          <div
+            class="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all duration-300 scale-100"
           >
-            <span>{{ addon.name }}</span>
-            <span class="font-medium">Rp {{ formatCurrency(addon.price) }}</span>
-          </li>
-        </ul>
-        <p v-else class="text-gray-500 mb-6">No add-ons were selected for this booking.</p>
-        <VButton variant="primary" @click="isAddOnsPopupVisible = false" class="w-full"
-          >Close</VButton
-        >
+            <h3 class="text-xl font-bold mb-4 text-center text-gray-800">Selected Add-Ons</h3>
+
+            <ul v-if="booking?.listOfAddOns && booking.listOfAddOns.length" class="space-y-3 mb-6">
+              <li
+                v-for="addon in booking.listOfAddOns"
+                :key="addon.id"
+                class="flex justify-between items-center bg-gray-50 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+              >
+                <span>{{ addon.name }}</span>
+                <span class="font-semibold text-green-700">
+                  Rp {{ formatCurrency(addon.price) }}
+                </span>
+              </li>
+            </ul>
+
+            <p v-else class="text-gray-500 mb-6 text-center italic">
+              No add-ons were selected for this booking.
+            </p>
+
+            <div class="flex justify-end">
+              <VButton variant="secondary" @click="isAddOnsPopupVisible = false"> Close </VButton>
+            </div>
+          </div>
+        </transition>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 

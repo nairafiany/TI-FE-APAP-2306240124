@@ -1,29 +1,31 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// --- Import Views ---
+// === HOME ===
+import HomeView from '@/views/HomeView.vue'
 
-// Vehicle Views
+// === VEHICLE VIEWS ===
 import VehicleView from '@/views/vehicle/VehicleView.vue'
 import CreateVehicleView from '@/views/vehicle/CreateVehicleView.vue'
 import VehicleDetailView from '@/views/vehicle/VehicleDetailView.vue'
 import EditVehicleView from '@/views/vehicle/EditVehicleView.vue'
-import UpdateBookingAddOnsView from '@/views/booking/UpdateBookingAddOnsView.vue'
-// Booking Views
+
+// === BOOKING VIEWS ===
 import BookingView from '@/views/booking/BookingView.vue'
 import CreateBookingView from '@/views/booking/CreateBookingView.vue'
 import BookingDetailView from '@/views/booking/BookingDetailView.vue'
-// [FIX] Impor komponen UpdateBookingView yang baru
 import UpdateBookingView from '@/views/booking/UpdateBookingView.vue'
-// (Anda akan menambahkan impor untuk AddOns dan Status di sini nanti)
 import UpdateBookingStatusView from '@/views/booking/UpdateBookingStatusView.vue'
-export default createRouter({
+import UpdateBookingAddOnsView from '@/views/booking/UpdateBookingAddOnsView.vue'
+import ChartView from '@/views/booking/BookingChartView.vue'
+// === ROUTER CONFIGURATION ===
+const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // === REDIRECT & HOME ROUTE ===
+    // === HOME ROUTE ===
     {
       path: '/',
       name: 'home',
-      redirect: '/bookings',
+      component: HomeView,
     },
 
     // === VEHICLE ROUTES ===
@@ -41,11 +43,13 @@ export default createRouter({
       path: '/vehicles/:id',
       name: 'vehicle-detail',
       component: VehicleDetailView,
+      props: true,
     },
     {
       path: '/vehicles/:id/update',
       name: 'vehicle-update',
       component: EditVehicleView,
+      props: true,
     },
 
     // === BOOKING ROUTES ===
@@ -63,35 +67,38 @@ export default createRouter({
       path: '/bookings/:id',
       name: 'booking-detail',
       component: BookingDetailView,
+      props: true,
     },
-    // [FIX] Tambahkan rute yang hilang untuk update details
     {
       path: '/bookings/:id/update-details',
       name: 'booking-update-details',
       component: UpdateBookingView,
+      props: true,
     },
     {
       path: '/bookings/:id/update-status',
       name: 'booking-update-status',
       component: UpdateBookingStatusView,
+      props: true,
     },
     {
       path: '/bookings/:id/update-addons',
       name: 'booking-update-addons',
       component: UpdateBookingAddOnsView,
-    },
-    // (Anda akan menambahkan rute untuk add-ons dan status di sini nanti)
-    /*
-    {
-      path: '/bookings/:id/update-addons',
-      name: 'booking-update-addons',
-      component: UpdateAddOnsView, // Buat file ini nanti
+      props: true,
     },
     {
-      path: '/bookings/:id/update-status',
-      name: 'booking-update-status',
-      component: UpdateStatusView, // Buat file ini nanti
+      path: '/bookings/chart', // ✅ ini tambahan barunya
+      name: 'booking-chart',
+      component: ChartView,
     },
-    */
+
+    // === FALLBACK (REDIRECT) ===
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/',
+    },
   ],
 })
+
+export default router

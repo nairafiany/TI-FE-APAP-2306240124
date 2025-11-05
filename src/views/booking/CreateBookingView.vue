@@ -153,6 +153,11 @@ const handleFinalizeBooking = async (addOnIds: number[]) => {
     dropOffTime: currentSearchCriteria.value.dropOffTime,
     includeDriver: currentSearchCriteria.value.includeDriver ?? false,
     addOnIds: addOnIds,
+
+    // --- ⬇️ TAMBAHKAN DUA BARIS INI ⬇️ ---
+    capacityNeeded: currentSearchCriteria.value.capacityNeeded,
+    transmissionNeeded: currentSearchCriteria.value.transmissionNeeded,
+    // --- ⬆️ PERBAIKAN SELESAI ⬆️ ---
   }
   const newBooking = await bookingStore.createBooking(payload)
   if (newBooking) {

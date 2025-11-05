@@ -1,54 +1,65 @@
 <template>
   <div class="p-8">
-    <!-- Header dengan Tombol Aksi -->
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">Daftar Pesanan</h1>
+    <!-- 🔹 Header -->
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Daftar Pesanan</h1>
+
+    <!-- 🔹 Action Bar -->
+    <div class="flex justify-between items-center mb-4">
       <div class="flex gap-2">
-        <!-- Tombol Create Booking -->
         <VButton to="/bookings/create" variant="primary"> + Create A New Booking </VButton>
-        <!-- Tombol Statistics -->
         <VButton to="/bookings/chart" variant="secondary"> 📊 Statistics </VButton>
+      </div>
+
+      <!-- 🔹 Search Bar Placeholder (future extensibility) -->
+      <div class="flex gap-2 items-end">
+        <VButton @click="fetchData" variant="secondary">🔄 Refresh</VButton>
       </div>
     </div>
 
-    <!-- Container Tabel -->
-    <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
-      <!-- Loading & Error State -->
-      <div v-if="loading" class="text-center p-4 text-gray-500">Loading data... ⏳</div>
-      <div v-else-if="error" class="text-center p-4 text-red-600">
+    <!-- 🔹 Booking Table -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <!-- Loading -->
+      <div v-if="loading" class="text-center p-10 text-gray-500">Memuat data pesanan... ⏳</div>
+
+      <!-- Error -->
+      <div v-else-if="error" class="text-center p-10 text-red-600">
         <strong>Error:</strong> {{ error }}
       </div>
-      <div v-else-if="!bookings.length" class="text-center p-4 text-gray-500">
-        Tidak ada pesanan ditemukan.
+
+      <!-- Empty -->
+      <div v-else-if="!bookings.length" class="text-center p-10 text-gray-500">
+        Tidak ada pesanan yang ditemukan.
       </div>
 
-      <!-- Tabel yang akan di-enhance oleh simple-datatables -->
-      <table v-else ref="bookingTableRef" class="min-w-full">
-        <thead class="bg-gray-100">
+      <!-- Table -->
+      <table v-else ref="bookingTableRef" class="min-w-full text-left border-collapse">
+        <thead class="bg-gray-100 text-gray-700">
           <tr>
-            <!-- Kolom sesuai spesifikasi -->
-            <th class="p-3 text-left">No</th>
-            <th class="p-3 text-left">ID</th>
-            <th class="p-3 text-left">Vehicle ID</th>
-            <th class="p-3 text-left">Waktu Mulai Sewa</th>
-            <th class="p-3 text-left">Waktu Akhir Sewa</th>
-            <th class="p-3 text-left">Lokasi Awal Sewa</th>
-            <th class="p-3 text-left">Status</th>
-            <th class="p-3 text-left">Total Harga</th>
-            <th class="p-3 text-center">Action</th>
+            <th class="p-4 border-b">No</th>
+            <th class="p-4 border-b">ID</th>
+            <th class="p-4 border-b">Vehicle ID</th>
+            <th class="p-4 border-b">Waktu Mulai Sewa</th>
+            <th class="p-4 border-b">Waktu Akhir Sewa</th>
+            <th class="p-4 border-b">Lokasi Awal</th>
+            <th class="p-4 border-b">Status</th>
+            <th class="p-4 border-b">Total Harga</th>
+            <th class="p-4 border-b text-center">Action</th>
           </tr>
         </thead>
+
         <tbody>
-          <!-- Data di-render di sini, simple-datatables akan mengambilnya -->
-          <tr v-for="(b, index) in bookings" :key="b.id" class="border-t hover:bg-gray-50">
-            <td class="p-3">{{ index + 1 }}</td>
-            <td class="p-3 font-mono text-sm">{{ b.id }}</td>
-            <td class="p-3 font-mono text-sm">{{ b.vehicleId }}</td>
-            <!-- Menggunakan data dari DTO jika ada, jika tidak N/A -->
-            <td class="p-3">{{ formatDate(b.pickUpTime) }}</td>
-            <td class="p-3">{{ formatDate(b.dropOffTime) }}</td>
-            <td class="p-3">{{ b.pickUpLocation }}</td>
-            <td class="p-3">
+          <tr
+            v-for="(b, index) in bookings"
+            :key="b.id"
+            class="border-b hover:bg-gray-50 transition"
+          >
+            <td class="p-4">{{ index + 1 }}</td>
+            <td class="p-4 font-mono text-sm">{{ b.id }}</td>
+            <td class="p-4 font-mono text-sm">{{ b.vehicleId }}</td>
+            <td class="p-4">{{ formatDate(b.pickUpTime) }}</td>
+            <td class="p-4">{{ formatDate(b.dropOffTime) }}</td>
+            <td class="p-4">{{ b.pickUpLocation }}</td>
+            <td class="p-4">
               <span
                 :class="getStatusClass(b.status)"
                 class="px-2 py-1 font-semibold leading-tight rounded-full text-xs"
@@ -56,10 +67,9 @@
                 {{ b.status }}
               </span>
             </td>
-            <td class="p-3">Rp {{ formatCurrency(b.totalPrice) }}</td>
-            <td class="p-3 text-center">
-              <!-- Tombol Detail menggunakan VButton -->
-              <VButton :to="`/bookings/${b.id}`" variant="secondary"> Detail </VButton>
+            <td class="p-4">Rp {{ formatCurrency(b.totalPrice) }}</td>
+            <td class="p-4 text-center">
+              <VButton :to="`/bookings/${b.id}`" variant="secondary" size="sm"> Detail </VButton>
             </td>
           </tr>
         </tbody>
@@ -70,26 +80,27 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
-// Gunakan Booking Service
 import { bookingService } from '@/services/booking.service'
 import type { Booking } from '@/interfaces/booking.interface'
 import { DataTable } from 'simple-datatables'
-import 'simple-datatables/dist/style.css' // Import CSS
-import VButton from '@/components/common/VButton.vue' // Gunakan VButton
+import 'simple-datatables/dist/style.css'
 
-// State lokal untuk view ini
+// Common UI components
+import VButton from '@/components/common/VButton.vue'
+
+// =================== STATE ===================
 const bookings = ref<Booking[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
-const bookingTableRef = ref<HTMLTableElement | null>(null)
+const bookingTablf = ref<HTMLTableElement | null>(null)
 let dataTableInstance: DataTable | null = null
 
-// Helper function untuk format tanggal
-const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return 'N/A' // Jika API tidak mengembalikan waktu
+// =================== UTIL FUNCTIONS ===================
+const formatDate = (dateValue: string | Date | undefined): string => {
+  if (!dateValue) return 'N/A'
   try {
-    // Asumsi API mengembalikan ISO String atau format yang bisa diparse Date
-    return new Date(dateString).toLocaleString('id-ID', {
+    const dateObj = typeof dateValue === 'string' ? new Date(dateValue) : dateValue
+    return dateObj.toLocaleString('id-ID', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -97,17 +108,13 @@ const formatDate = (dateString: string | undefined): string => {
       minute: '2-digit',
     })
   } catch (e) {
-    console.warn(`Could not format date: ${dateString}`, e)
-    return dateString // Return original if formatting fails
+    return String(dateValue)
   }
 }
 
-// Helper function untuk format mata uang
-const formatCurrency = (amount: number): string => {
-  return amount.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
+const formatCurrency = (amount: number): string =>
+  amount.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-// Helper function untuk kelas status
 const getStatusClass = (status: string) => {
   switch (status) {
     case 'Upcoming':
@@ -121,62 +128,49 @@ const getStatusClass = (status: string) => {
   }
 }
 
-// Fungsi untuk fetch data menggunakan service
+// =================== FETCH ===================
 const fetchData = async () => {
   loading.value = true
   error.value = null
   try {
     bookings.value = await bookingService.getAllBookings()
   } catch (err: any) {
-    // Error sudah di-handle oleh toast di service, cukup set state error lokal
-    error.value = err.message || 'Failed to fetch bookings.'
+    error.value = err.message || 'Gagal memuat data pesanan.'
   } finally {
     loading.value = false
   }
 }
 
-// Ambil data saat komponen dimuat
-onMounted(() => {
-  fetchData()
-})
+onMounted(fetchData)
 
-// Inisialisasi atau update DataTable saat data bookings berubah
+// =================== DATATABLE INIT ===================
 watch(
-  bookings, // Watch state lokal 'bookings'
+  bookings,
   (newBookings) => {
     nextTick(() => {
-      // Tunggu DOM update
       if (bookingTableRef.value) {
-        if (dataTableInstance) {
-          dataTableInstance.destroy() // Hapus instance lama
-        }
-        // Buat instance baru jika ada data
+        if (dataTableInstance) dataTableInstance.destroy()
         if (newBookings && newBookings.length > 0) {
           dataTableInstance = new DataTable(bookingTableRef.value, {
             searchable: true,
-            perPage: 10, // Default 10 per halaman
-            perPageSelect: [5, 10, 15, 20], // Opsi jumlah per halaman
+            perPage: 10,
+            perPageSelect: [5, 10, 20],
             labels: {
-              placeholder: 'Search...',
-              perPage: '{select} entries per page',
-              noRows: 'No bookings found',
-              info: 'Showing {start} to {end} of {rows} entries',
+              placeholder: 'Cari pesanan...',
+              perPage: '{select} data per halaman',
+              noRows: 'Tidak ada data ditemukan',
+              info: 'Menampilkan {start}–{end} dari {rows} data',
             },
-            // Anda bisa menambahkan konfigurasi sorting default di sini jika perlu
-            // Contoh: sort by ID descending (kolom kedua)
-            // sortable: true,
-            // columns: [ { select: 1, sort: "desc" } ]
           })
         }
       }
     })
   },
-  { deep: true }, // Perhatikan perubahan dalam array
+  { deep: true },
 )
 </script>
 
 <style>
-/* Styling tambahan untuk simple-datatables jika perlu */
 .dataTable-selector {
   margin-right: 0.5rem;
 }

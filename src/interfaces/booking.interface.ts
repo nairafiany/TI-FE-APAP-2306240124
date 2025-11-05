@@ -70,3 +70,9 @@ export interface BookingUpdateStatusPayload {
 export interface BookingUpdateAddOnsPayload {
   addOnIds: number[]
 }
+
+export interface BookingChartResponse {
+  period: 'monthly' | 'quarterly'
+  year: number
+  data: Record<string, number> // contoh: { "January": 2, "February": 0, "March": 1 }
+}

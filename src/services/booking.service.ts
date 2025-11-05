@@ -191,6 +191,25 @@ export class BookingService {
       return false
     }
   }
+
+  /**
+   * 📊 Ambil data statistik booking berdasarkan periode (monthly / quarterly)
+   */
+  async getChartData(period: string, year: number): Promise<Record<string, number>> {
+    try {
+      const { data } = await axios.get(`${baseBookingUrl}/chart`, {
+        params: { period, year },
+      })
+      console.log('✅ [GET CHART DATA]', data)
+      toast.success(`Data chart periode ${period} tahun ${year} berhasil dimuat.`)
+      return data.data || {}
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || 'Gagal memuat detail pesanan chart.'
+      console.error('❌ [GET CHART DATA]', error)
+      toast.error(`Error: ${msg}`)
+      return {}
+    }
+  }
 }
 
 // Export the singleton instance for easy import
