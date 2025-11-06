@@ -5,5 +5,4 @@ export interface Province {
 
 export interface WilayahApiResponse {
   data: Province[]
-  // Anda bisa menambahkan meta jika diperlukan
 }

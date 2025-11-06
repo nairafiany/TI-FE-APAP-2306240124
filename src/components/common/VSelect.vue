@@ -1,4 +1,3 @@
-<!-- src/components/common/VSelect.vue -->
 <template>
   <div class="w-full">
     <label v-if="label" :for="selectId" class="block text-sm font-medium text-gray-700 mb-1">

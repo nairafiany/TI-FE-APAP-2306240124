@@ -92,7 +92,7 @@ import VButton from '@/components/common/VButton.vue'
 const bookings = ref<Booking[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
-const bookingTablf = ref<HTMLTableElement | null>(null)
+const bookingTableRef = ref<HTMLTableElement | null>(null)
 let dataTableInstance: DataTable | null = null
 
 // =================== UTIL FUNCTIONS ===================

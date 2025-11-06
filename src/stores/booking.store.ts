@@ -13,9 +13,8 @@ import type {
 } from '@/interfaces/booking.interface'
 
 import type { CommonResponseInterface } from '@/interfaces/common.response.interface'
-import type { Vehicle } from '@/interfaces/vehicle.interface' // [FIX] Hanya impor 'Vehicle' untuk hasil pencarian
+import type { Vehicle } from '@/interfaces/vehicle.interface'
 
-// Base URL dari environment variables
 const baseBookingUrl = `${import.meta.env.VITE_API_URL}/bookings`
 
 export const useBookingStore = defineStore('booking', {
@@ -108,7 +107,7 @@ export const useBookingStore = defineStore('booking', {
           payload,
         )
         if (data.status === 200) {
-          this.availableVehicles = data.data || [] // Sekarang tidak ada error karena tipe sudah cocok
+          this.availableVehicles = data.data || []
           if (this.availableVehicles.length === 0) {
             toast.info('Tidak ada kendaraan yang tersedia sesuai kriteria.')
           } else {
@@ -157,10 +156,7 @@ export const useBookingStore = defineStore('booking', {
         this.loading = false
       }
     },
-    // ===================== 🔹 UPDATE BOOKING STATUS =====================
-    // ... (state dan actions lainnya) ...
 
-    // ===================== 🔹 UPDATE BOOKING STATUS =====================
     async updateBookingStatus(
       id: string,
       payload: BookingUpdateStatusPayload,
@@ -197,8 +193,6 @@ export const useBookingStore = defineStore('booking', {
         this.loading = false
       }
     },
-
-    // ... (sisa actions) ...
 
     async updateBookingAddOns(
       id: string,

@@ -10,9 +10,7 @@ export const useLocationStore = defineStore('location', {
     error: null as string | null,
   }),
   actions: {
-    // Action untuk mengambil dan menyimpan data provinsi
     async fetchProvinces() {
-      // Hindari fetching ulang jika data sudah ada
       if (this.provinces.length > 0) return
 
       this.loading = true

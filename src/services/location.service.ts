@@ -2,10 +2,6 @@ import axios from 'axios'
 import { toast } from 'vue-sonner'
 import type { Province, WilayahApiResponse } from '@/interfaces/location.interface'
 
-// GANTI URL INI
-// const PROVINCES_URL = 'https://wilayah.id/api/provinces.json';
-
-// MENJADI URL INI (menggunakan proxy)
 const PROVINCES_URL = '/apiwilayah/api/provinces.json'
 
 class LocationService {
@@ -26,7 +22,6 @@ class LocationService {
 
       console.log('✅ [GET PROVINCES]', response.data)
 
-      // Pastikan response.data.data ada dan merupakan array
       if (response.data && Array.isArray(response.data.data)) {
         return response.data.data
       }
@@ -41,5 +36,4 @@ class LocationService {
   }
 }
 
-// Export instance singleton
 export const locationService = LocationService.getInstance()

@@ -3,7 +3,6 @@ import { toast } from 'vue-sonner'
 import type { CommonResponseInterface } from '@/interfaces/common.response.interface' // Asumsi Anda punya file ini
 import type { RentalAddOn } from '@/interfaces/addon.interface'
 
-// Base URL dari environment variables, sesuaikan dengan endpoint di backend
 const baseAddOnUrl = `${import.meta.env.VITE_API_URL}/addons`
 
 export class AddOnService {
@@ -18,7 +17,6 @@ export class AddOnService {
 
   async getAllAddOns(): Promise<RentalAddOn[]> {
     try {
-      // Menggunakan tipe respons yang sama seperti di booking service
       const { data } = await axios.get<CommonResponseInterface<RentalAddOn[]>>(baseAddOnUrl)
       console.log('✅ [GET ALL ADD-ONS]', data)
 
@@ -33,7 +31,6 @@ export class AddOnService {
 
         return addOns
       } else {
-        // Jika status bukan 200, lempar error agar ditangkap oleh blok catch
         throw new Error(data.message || 'Gagal memuat add-ons.')
       }
     } catch (error: any) {
@@ -45,5 +42,4 @@ export class AddOnService {
   }
 }
 
-// Export instance singleton agar mudah diimpor di file lain (misal: store)
 export const addOnService = AddOnService.getInstance()

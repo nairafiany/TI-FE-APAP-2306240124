@@ -35,9 +35,6 @@ export interface UpdateVehicleRequest extends VehicleRequest {
   id: string
 }
 
-/**
- * Sesuai dengan: VehicleCreateRequestDTO.java
- */
 export interface VehicleCreatePayload {
   rentalVendorId: number | null
   type: string
@@ -52,9 +49,6 @@ export interface VehicleCreatePayload {
   price: number | null
 }
 
-/**
- * Sesuai dengan: VehicleUpdateRequestDTO.java
- */
 export interface VehicleUpdatePayload {
   type: string
   brand: string

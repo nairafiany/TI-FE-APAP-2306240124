@@ -104,7 +104,6 @@ import type {
 } from '@/interfaces/booking.interface'
 import type { Vehicle } from '@/interfaces/vehicle.interface'
 
-// Helper untuk format tanggal dari ISO string ke format input datetime-local
 const formatDateTimeForInput = (isoString: string | Date | undefined): string => {
   if (!isoString) return ''
   const date = new Date(isoString)
@@ -150,7 +149,6 @@ watch(
         dropOffTime: formatDateTimeForInput(booking.dropOffTime),
         capacityNeeded: booking.capacityNeeded || 1,
         transmissionNeeded: (booking.transmissionNeeded as 'Manual' | 'Automatic') || 'Automatic',
-        // KIRIM ID BOOKING SAAT INI UNTUK DIKECUALIKAN
         bookingIdToExclude: booking.id,
       }
 
@@ -158,10 +156,8 @@ watch(
       currentSearchCriteria.value = data
       isDataLoaded.value = true
 
-      // Lakukan pencarian otomatis
       await bookingStore.searchAvailableVehicles(data)
 
-      // Cari dan pilih otomatis kendaraan yang sudah dipesan sebelumnya dari hasil pencarian
       const originalVehicle = bookingStore.availableVehicles.find((v) => v.id === booking.vehicleId)
       if (originalVehicle) {
         selectedVehicle.value = originalVehicle
@@ -169,13 +165,12 @@ watch(
         toast.warning(
           'The original vehicle is no longer available with these details. Please select another one.',
         )
-        selectedVehicle.value = null // Biarkan kosong jika tidak tersedia
+        selectedVehicle.value = null
       }
     }
   },
 )
 
-// Computed property untuk menghitung jumlah hari sewa
 const rentalDays = computed(() => {
   if (!currentSearchCriteria.value?.pickUpTime || !currentSearchCriteria.value?.dropOffTime)
     return 1
@@ -186,7 +181,6 @@ const rentalDays = computed(() => {
   return Math.max(1, diffDays)
 })
 
-// Fungsi untuk menghitung total harga kendaraan
 const calculateVehicleTotalPrice = (vehicle: Vehicle) => {
   if (!currentSearchCriteria.value) return vehicle.price || 0
   const vehiclePrice = vehicle.price || 0
@@ -195,11 +189,9 @@ const calculateVehicleTotalPrice = (vehicle: Vehicle) => {
   return vehicleCost + driverCost
 }
 
-// Fungsi untuk pencarian MANUAL oleh pengguna
 const handleManualSearch = async (payload: BookingSearchPayload) => {
   selectedVehicle.value = null
 
-  // Tambahkan juga ID saat pengguna mencari secara manual
   const searchPayload: BookingSearchPayload = {
     ...payload,
     bookingIdToExclude: bookingId.value,
@@ -209,13 +201,9 @@ const handleManualSearch = async (payload: BookingSearchPayload) => {
   await bookingStore.searchAvailableVehicles(searchPayload)
 }
 
-// 2. Tambahkan fungsi handler baru ini
 const handleFormChange = (payload: BookingSearchPayload) => {
-  // Fungsi ini akan dipanggil setiap kali ada ketikan di form
-  // Ini menjaga 'currentSearchCriteria' tetap sinkron
   currentSearchCriteria.value = {
     ...payload,
-    // Pastikan bookingIdToExclude selalu ada
     bookingIdToExclude: bookingId.value,
   }
 }

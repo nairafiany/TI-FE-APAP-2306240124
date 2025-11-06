@@ -25,7 +25,6 @@ export interface Booking {
   status: 'Upcoming' | 'Ongoing' | 'Done'
   includeDriver: boolean
 
-  // [FIX] Properti-properti ini sekarang akan diisi oleh getBookingById
   capacityNeeded?: number
   transmissionNeeded?: 'Manual' | 'Automatic'
   listOfAddOns?: AddOnDetail[]

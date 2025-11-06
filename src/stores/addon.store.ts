@@ -5,14 +5,12 @@ import { toast } from 'vue-sonner'
 import type { RentalAddOn } from '@/interfaces/addon.interface'
 import type { CommonResponseInterface } from '@/interfaces/common.response.interface'
 
-// Ganti endpoint ini jika berbeda
 const baseAddOnUrl = `${import.meta.env.VITE_API_URL}/addons`
 
 export const useAddOnStore = defineStore('addon', () => {
-  // --- State ---
   const addOns = ref<RentalAddOn[]>([])
   const loading = ref(false)
-  // [FIX] Tambahkan state 'error'
+
   const error = ref<string | null>(null)
 
   // --- Actions ---
@@ -37,7 +35,6 @@ export const useAddOnStore = defineStore('addon', () => {
     }
   }
 
-  // [FIX] Expose 'error' agar bisa diakses dari komponen
   return {
     addOns,
     loading,

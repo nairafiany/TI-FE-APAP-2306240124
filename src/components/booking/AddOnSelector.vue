@@ -64,32 +64,26 @@ import { ref, onMounted, computed } from 'vue'
 import { useAddOnStore } from '@/stores/addon.store'
 import type { RentalAddOn } from '@/interfaces/addon.interface'
 
-// [BARU] Definisikan props untuk menerima data dari parent
 const props = defineProps<{
   basePrice: number
   rentalDays: number
 }>()
 
-// Definisikan emits untuk komunikasi dengan parent component
 const emit = defineEmits<{
   (e: 'addons-selected', ids: number[]): void
   (e: 'back'): void
 }>()
 
 const addOnStore = useAddOnStore()
-// [DIUBAH] Simpan seluruh objek add-on yang dipilih, bukan hanya ID
 const selectedAddOns = ref<RentalAddOn[]>([])
 
-// Ambil data add-ons saat komponen dimuat
 onMounted(() => {
   if (addOnStore.addOns.length === 0) {
     addOnStore.fetchAddOns()
   }
 })
 
-// [BARU] Computed properties untuk menghitung harga secara dinamis
 const addOnsTotalPrice = computed(() => {
-  // Total harga sesuai rumus: harga add-on 1 + ... + harga add-on n
   return selectedAddOns.value.reduce((total, addon) => total + addon.price, 0)
 })
 
@@ -102,7 +96,6 @@ const goBack = () => {
 }
 
 const finalizeBooking = () => {
-  // [DIUBAH] Ambil ID dari objek add-on yang dipilih sebelum mengirim ke parent
   const selectedIds = selectedAddOns.value.map((addon) => addon.id)
   emit('addons-selected', selectedIds)
 }

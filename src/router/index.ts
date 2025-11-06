@@ -88,7 +88,7 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/bookings/chart', // ✅ ini tambahan barunya
+      path: '/bookings/chart',
       name: 'booking-chart',
       component: ChartView,
     },

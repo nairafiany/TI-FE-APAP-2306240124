@@ -15,7 +15,6 @@ export class VendorService {
     return VendorService.instance
   }
 
-  // 🔹 Fetch all vendors
   async getAllVendors(): Promise<Vendor[]> {
     try {
       const { data } = await axios.get<CommonResponseInterface<Vendor[]>>(baseVendorUrl)
@@ -29,7 +28,6 @@ export class VendorService {
     }
   }
 
-  // 🔹 Fetch vendor locations
   async getVendorLocations(vendorId: number): Promise<string[]> {
     try {
       const { data } = await axios.get<CommonResponseInterface<string[]>>(

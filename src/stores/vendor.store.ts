@@ -7,15 +7,11 @@ import type { Vendor } from '@/interfaces/vendor.interface'
 export const useVendorStore = defineStore('vendor', () => {
   // --- STATE ---
   const vendors = ref<Vendor[]>([])
-  // ✅ INI STATE PENTING UNTUK LOKASI YANG DIPILIH
   const selectedVendorLocations = ref<string[]>([])
 
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  // --- ACTIONS ---
-
-  // Ambil SEMUA vendors
   async function fetchAllVendors() {
     loading.value = true
     error.value = null
@@ -30,14 +26,11 @@ export const useVendorStore = defineStore('vendor', () => {
     }
   }
 
-  // Ambil LOKASI untuk SATU vendor
   async function fetchVendorLocations(vendorId: number) {
-    // Tidak perlu set loading.value = true agar tidak mengganggu UI
     error.value = null
     try {
       const data = await vendorService.getVendorLocations(vendorId)
-      // ✅ INI BARIS PALING PENTING:
-      // Pastikan state di-update dengan data lokasi yang baru
+
       selectedVendorLocations.value = data
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch locations.'
@@ -46,7 +39,6 @@ export const useVendorStore = defineStore('vendor', () => {
     }
   }
 
-  // --- RETURN ---
   return {
     vendors,
     selectedVendorLocations,

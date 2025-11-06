@@ -11,7 +11,6 @@ import type {
 import type { CommonResponseInterface } from '@/interfaces/common.response.interface'
 import type { Vehicle } from '@/interfaces/vehicle.interface'
 
-// Base URL from environment variables
 const baseBookingUrl = `${import.meta.env.VITE_API_URL}/bookings`
 
 export class BookingService {
@@ -212,5 +211,4 @@ export class BookingService {
   }
 }
 
-// Export the singleton instance for easy import
 export const bookingService = BookingService.getInstance()
