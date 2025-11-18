@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  # Nama Ingress
+  name: vehiclerental-fe-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    # Domain TI FE Anda
+    - host: 2306240124-fe.hafizmuh.site
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # Target Service (harus cocok dengan nama Service di atas)
+                name: vehiclerental-fe-service
+                port:
+                  # Target Port (harus cocok dengan port Service di atas)
+                  number: 80

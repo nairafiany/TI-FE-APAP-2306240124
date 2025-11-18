@@ -1,0 +1,90 @@
+stages:
+  - build
+  - docker-push
+  - deploy
+
+variables:
+  # Variabel ini akan mengambil nilainya dari 'TI_FE_DOCKER_IMAGE' yang set di GitLab
+  DOCKER_IMAGE_NAME: $TI_FE_DOCKER_IMAGE
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+
+# ============================
+# BUILD
+# ============================
+build:
+  stage: build
+  image: node:20
+  script:
+    - npm ci
+    # VITE_API_URL akan diteruskan oleh GitLab ke tahap build ini
+    - npm run build
+  artifacts:
+    paths:
+      # Hasil build yang akan dimasukkan ke image Nginx
+      - dist
+      # File konfigurasi yang dibutuhkan di tahap selanjutnya
+      - Dockerfile
+      - nginx.conf
+      - k8s/
+    expire_in: 1 hour
+  only:
+    # Mentrigger pipeline HANYA untuk branch TI
+    - feat/praktikum-9
+
+# ============================
+# DOCKER PUSH
+# ============================
+docker-push:
+  stage: docker-push
+  image: docker:24
+  services:
+    - name: docker:24-dind
+      command: ['--insecure-registry', 'registry-1.docker.io']
+  dependencies:
+    - build
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  script:
+    - |
+      docker build \
+        --build-arg VITE_API_URL=$VITE_API_URL \
+        -t $DOCKER_IMAGE_NAME:$IMAGE_TAG .
+    - docker push $DOCKER_IMAGE_NAME:$IMAGE_TAG
+  only:
+    # Mentrigger pipeline HANYA untuk branch TI
+    - feat/praktikum-9
+
+# ============================
+# DEPLOY
+# ============================
+deploy:
+  stage: deploy
+  image: alpine:latest
+  dependencies:
+    - build # Mengambil artifact k8s/ dari tahap build
+  before_script:
+    - apk add --no-cache openssh bash
+    - mkdir -p ~/.ssh
+    - echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+  script:
+    # Mengganti placeholder tag di file deployment.yaml
+    - sed "s|REPLACE_ME_TAG|$IMAGE_TAG|g" k8s/deployment.yaml > deployment.yaml
+    - echo "Creating -> deployment.yaml, service.yaml, ingress.yaml"
+
+    # Membuat direktori di server EC2 (menggunakan nama app TI)
+    - ssh $EC2_USER@$EC2_HOST "mkdir -p ~/app/vehiclerental-fe/k8s"
+
+    # Mengirim file k8s (deployment.yaml yang sudah diproses + service & ingress asli)
+    - scp deployment.yaml k8s/service.yaml k8s/ingress.yaml $EC2_USER@$EC2_HOST:~/app/vehiclerental-fe/k8s/
+
+    # Menjalankan 'kubectl apply' di server
+    - |
+      ssh $EC2_USER@$EC2_HOST "
+        sudo k3s kubectl apply -f ~/app/vehiclerental-fe/k8s/ &&
+        sudo k3s kubectl rollout status deployment/vehiclerental-fe -n default
+      "
+  only:
+    # Mentrigger pipeline HANYA untuk branch TI Anda
+    - feat/praktikum-9

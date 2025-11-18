@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Nama Deployment untuk TI FE Anda
+  name: vehiclerental-fe
+  labels:
+    app: vehiclerental-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehiclerental-fe
+  template:
+    metadata:
+      labels:
+        # Label ini (app: vehiclerental-fe) akan dicari oleh Service
+        app: vehiclerental-fe
+    spec:
+      containers:
+        - name: vehiclerental-fe-container
+          # Image Docker Hub TI FE Anda
+          image: nairafiany/vehiclerental-2306240124-fe:REPLACE_ME_TAG
+          ports:
+            # Port Nginx yang diekspos di Dockerfile
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
