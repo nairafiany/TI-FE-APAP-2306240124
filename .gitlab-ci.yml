@@ -86,5 +86,4 @@ deploy:
         sudo k3s kubectl rollout status deployment/vehiclerental-fe -n default
       "
   only:
-    # Mentrigger pipeline HANYA untuk branch TI Anda
     - feat/praktikum-9

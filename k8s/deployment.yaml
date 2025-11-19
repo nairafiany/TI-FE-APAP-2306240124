@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  # Nama Deployment untuk TI FE Anda
   name: vehiclerental-fe
   labels:
     app: vehiclerental-fe
