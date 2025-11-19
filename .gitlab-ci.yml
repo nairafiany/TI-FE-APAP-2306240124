@@ -79,7 +79,6 @@ deploy:
     # Mengirim file k8s (deployment.yaml yang sudah diproses + service & ingress asli)
     - scp deployment.yaml k8s/service.yaml k8s/ingress.yaml $EC2_USER@$EC2_HOST:~/app/vehiclerental-fe/k8s/
 
-    # Menjalankan 'kubectl apply' di server
     - |
       ssh $EC2_USER@$EC2_HOST "
         sudo k3s kubectl apply -f ~/app/vehiclerental-fe/k8s/ &&
