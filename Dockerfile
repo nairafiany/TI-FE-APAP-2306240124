@@ -9,14 +9,16 @@ ARG VITE_API_URL
 
 ENV VITE_API_URL=$VITE_API_URL
 
-RUN npm ci
+# UBAH DISINI: Gunakan 'install' untuk fix cache & pastikan dependency terdownload
+RUN npm install
 
 COPY . .
 
 # Membuat file .env.production hanya dengan satu variabel API
 RUN echo "VITE_API_URL=$VITE_API_URL" > .env.production
 
-RUN npm run build
+# UBAH DISINI: Gunakan 'build-only' agar lebih ringan & menghindari error run-p
+RUN npm run build-only
 
 # Production stage
 FROM nginx:alpine AS production-stage
