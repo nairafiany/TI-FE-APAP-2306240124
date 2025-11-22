@@ -1,23 +1,23 @@
-FROM node:20 AS build-stage
+# UBAH 1: Gunakan 'alpine' (versi linux ringan) agar hemat RAM Runner
+FROM node:20-alpine AS build-stage
 
 WORKDIR /app
 
 COPY package*.json ./
 
-# Hanya butuh satu API URL untuk TI Anda
 ARG VITE_API_URL
-
 ENV VITE_API_URL=$VITE_API_URL
 
-# UBAH DISINI: Gunakan 'install' untuk fix cache & pastikan dependency terdownload
-RUN npm install
+# UBAH 2: Optimasi npm install
+# --no-audit: Jangan cek security (hemat waktu/net)
+# --progress=false: Jangan tampilkan progress bar (hemat RAM log)
+# --verbose: Agar log tetap jalan dan tidak dikira "hang" oleh Runner
+RUN npm install --no-audit --progress=false --verbose
 
 COPY . .
 
-# Membuat file .env.production hanya dengan satu variabel API
 RUN echo "VITE_API_URL=$VITE_API_URL" > .env.production
 
-# UBAH DISINI: Gunakan 'build-only' agar lebih ringan & menghindari error run-p
 RUN npm run build-only
 
 # Production stage
